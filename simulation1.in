@@ -1,458 +1,455 @@
-{\rtf1\ansi\ansicpg1252\deff0\deflang2057{\fonttbl{\f0\fnil\fcharset0 Courier New;}}
-\viewkind4\uc1\pard\f0\fs18\par
-go atlas \par
-\par
-#-------------------------------------------------------------------\par
-# VARIABLES - Change as per needed...\par
-#-------------------------------------------------------------------\par
-\par
-set X_SCALE_START=-0.500\par
-set X_SCALE_END=0.500\par
-set NT_WIDTH=0.200\par
-\par
-set NT_TOP_HEIGHT=3\par
-set NT_EMITTER_TOP_HEIGHT=0.3\par
-set NT_QWELL_INDIVIDUAL_HEIGHT=0.005\par
-set NT_QWELL_PADDING_HEIGHT=0\par
-set NT_QWELL_BARRIER_HEIGHT=0.005\par
-set NT_EMITTER_BOTTOM_HEIGHT=0.100\par
-set NT_BOTTOM_HEIGHT=1.5\par
-set SUBSTRATE_HEIGHT=0\par
-\par
-set NT_NUMBER_OF_QWELLS=10\par
-# Do also remove/add wells manually as there is no way to programmatically change this\par
-\par
-# set the following material without x.comp, y.comp etc\par
-set PROPERTY_MATERIAL_QWELL=GaN\par
-set PROPERTY_MATERIAL_TOP=GaN\par
-set PROPERTY_MATERIAL_BOTTOM=GaN\par
-set PROPERTY_MATERIAL_EMITTER_TOP=AlGaN\par
-set PROPERTY_MATERIAL_EMITTER_BOTTOM=AlGaN\par
-set PROPERTY_MATERIAL_BARRIER=AlGaN\par
-\par
-# Following are materials used in the nanotube. x.comp, y.comp is allowed\par
-set MATERIAL_SURROUNDING=Air\par
-set MATERIAL_NT_TOP=$PROPERTY_MATERIAL_TOP\par
-set MATERIAL_NT_BOTTOM=$PROPERTY_MATERIAL_BOTTOM\par
-set MATERIAL_NT_QWELL=$PROPERTY_MATERIAL_QWELL\par
-set MATERIAL_NT_QWELL_PADDING=InGaN\par
-set MATERIAL_NT_QWELL_BARRIER=$PROPERTY_MATERIAL_BARRIER\par
-set MATERIAL_NT_EMITTER_TOP=$PROPERTY_MATERIAL_EMITTER_TOP\par
-set MATERIAL_NT_EMITTER_BOTTOM=$PROPERTY_MATERIAL_EMITTER_BOTTOM\par
-set MATERIAL_SUBSTRATE=Sapphire\par
-\par
-set Y_SPAC_SCALE=1\par
-set X_SPAC_SCALE=10\par
-\par
-#-------------------------------------------------------------------\par
-# CALCULATED VARIABLES - DO NOT CHANGE!!\par
-#-------------------------------------------------------------------\par
-\par
-set X_SCALE_WIDTH=$X_SCALE_END-$X_SCALE_START\par
-set X_SCALE_MID=($X_SCALE_START+$X_SCALE_END)/2\par
-set NT_X_START=$X_SCALE_MID-($NT_WIDTH/2)\par
-set NT_X_END=$X_SCALE_MID+($NT_WIDTH/2)\par
-\par
-set REGION_NO=0\par
-\par
-# The following regions will be automatically calculated\par
-set REGION_NO_TOP=0\par
-set REGION_NO_BOTTOM=0\par
-set REGION_NO_SUBSTRATE=0\par
-set REGION_NO_EMITTER_TOP=0\par
-set REGION_NO_EMITTER_BOTTOM=0\par
-\par
-set NT_QWELL_INDIVIDUAL_EFFECTIVE_HEIGHT=$NT_QWELL_INDIVIDUAL_HEIGHT+(2*$NT_QWELL_PADDING_HEIGHT)\par
-set NT_QWELL_TOTAL_HEIGHT=$NT_QWELL_INDIVIDUAL_EFFECTIVE_HEIGHT*$NT_NUMBER_OF_QWELLS + $NT_QWELL_BARRIER_HEIGHT*($NT_NUMBER_OF_QWELLS-1)\par
-set Y_COORDINATE_SUBSTRATE_BOTTOM=0\par
-set Y_COORDINATE_NT_BOTTOM=-$SUBSTRATE_HEIGHT\par
-set Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM=$Y_COORDINATE_NT_BOTTOM-$NT_BOTTOM_HEIGHT\par
-set Y_COORDINATE_QWELL_BOTTOM=$Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM-$NT_EMITTER_BOTTOM_HEIGHT\par
-set Y_COORDINATE_QWELL_TOP=$Y_COORDINATE_QWELL_BOTTOM-$NT_QWELL_TOTAL_HEIGHT\par
-set Y_COORDINATE_NT_TOP_EMITTER_TOP=$Y_COORDINATE_QWELL_TOP-$NT_EMITTER_TOP_HEIGHT\par
-set Y_COORDINATE_NT_TOP=$Y_COORDINATE_NT_TOP_EMITTER_TOP-$NT_TOP_HEIGHT\par
-\par
-#-------------------------------------------------------------------\par
-# MESH GENERATION\par
-#-------------------------------------------------------------------\par
-\par
-mesh auto\par
-\par
-x.m l=$X_SCALE_START\tab\tab\tab\tab\tab\tab\tab\tab s=$X_SPAC_SCALE\par
-x.m l=$X_SCALE_END\tab\tab\tab\tab\tab\tab\tab\tab s=$X_SPAC_SCALE\par
-\par
-y.m l=$Y_COORDINATE_NT_TOP\tab\tab\tab\tab\tab\tab\tab s=$Y_SPAC_SCALE*2\par
-y.m l=$Y_COORDINATE_QWELL_TOP-(0.1*$NT_QWELL_TOTAL_HEIGHT)\tab\tab s=$Y_SPAC_SCALE\par
-y.m l=$Y_COORDINATE_QWELL_TOP\tab\tab\tab\tab\tab\tab s=$NT_QWELL_PADDING_HEIGHT/5\par
-y.m l=$Y_COORDINATE_QWELL_BOTTOM\tab\tab\tab\tab\tab\tab s=$NT_QWELL_PADDING_HEIGHT/5\par
-y.m l=$Y_COORDINATE_QWELL_BOTTOM+(0.1*$NT_QWELL_TOTAL_HEIGHT)\tab\tab s=($Y_SPAC_SCALE*3)/4\par
-y.m l=$Y_COORDINATE_NT_BOTTOM\tab\tab\tab\tab\tab\tab s=$Y_SPAC_SCALE\par
-y.m l=$Y_COORDINATE_SUBSTRATE_BOTTOM\tab\tab\tab\tab\tab s=$Y_SPAC_SCALE\par
-\par
-#-------------------------------------------------------------\par
-# DEFINING REGIONS\par
-#-------------------------------------------------------------\par
-\par
-# dummy region\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO material=$MATERIAL_SURROUNDING\tab\tab x.max=$NT_X_START x.min=$X_SCALE_START\tab y.max=$Y_COORDINATE_SUBSTRATE_BOTTOM y.min=$Y_COORDINATE_NT_TOP\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO material=$MATERIAL_SURROUNDING\tab\tab x.max=$X_SCALE_END x.min=$NT_X_START\tab y.max=$Y_COORDINATE_SUBSTRATE_BOTTOM y.min=$Y_COORDINATE_NT_TOP\par
-\par
-# Substrate\par
-set REGION_NO=$REGION_NO+1\par
-set REGION_NO_SUBSTRATE=$REGION_NO\par
-region num=$REGION_NO\tab material=$MATERIAL_SUBSTRATE\tab y.max=$Y_COORDINATE_SUBSTRATE_BOTTOM y.min=$Y_COORDINATE_NT_BOTTOM substrate\par
-\par
-# Nanotube bottom\par
-set REGION_NO=$REGION_NO+1\par
-set REGION_NO_BOTTOM=$REGION_NO\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_BOTTOM\tab x.min=$NT_X_START x.max=$NT_X_END\tab\tab y.max=$Y_COORDINATE_NT_BOTTOM y.min=$Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM\par
-\par
-# Bottom emitter\par
-\par
-set REGION_NO=$REGION_NO+1\par
-set REGION_NO_EMITTER_BOTTOM=$REGION_NO\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_EMITTER_BOTTOM\tab x.min=$NT_X_START x.max=$NT_X_END\tab\\\par
-\tab\tab y.max=$Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM y.min=$Y_COORDINATE_QWELL_BOTTOM\par
-\par
-# 10 wells -----------------------------------------------------------------------------------------------------------\par
-\par
-set Y_POINTER=$Y_COORDINATE_QWELL_BOTTOM\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_BARRIER\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT\par
-\par
-#-------------------------------------------------------BARRIER-------------------------------------------------------\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL\tab\tab x.min=$NT_X_START x.max=$NT_X_END name=well \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT\par
-\par
-set REGION_NO=$REGION_NO+1\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_QWELL_PADDING\tab x.min=$NT_X_START x.max=$NT_X_END \\ \par
-\tab\tab\tab\tab y.max=$Y_POINTER\tab y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT\par
-\par
-\par
-\par
-\par
-\par
-# Add to or remove wells from here\par
-\par
-# Top emitter\par
-\par
-set REGION_NO=$REGION_NO+1\par
-set REGION_NO_EMITTER_TOP=$REGION_NO\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_EMITTER_BOTTOM\tab x.min=$NT_X_START x.max=$NT_X_END\tab\\\par
-\tab\tab y.max=$Y_COORDINATE_QWELL_TOP y.min=$Y_COORDINATE_NT_TOP_EMITTER_TOP\par
-\par
-# Nanotube top\par
-set REGION_NO=$REGION_NO+1\par
-set REGION_NO_TOP=$REGION_NO\par
-region num=$REGION_NO\tab material=$MATERIAL_NT_TOP\tab\tab x.min=$NT_X_START x.max=$NT_X_END\tab\tab y.max=$Y_COORDINATE_NT_TOP_EMITTER_TOP y.min=$Y_COORDINATE_NT_TOP\par
-\par
-\par
-#-------------------------------------------------------------------\par
-# ELECTRODES\par
-#-------------------------------------------------------------------\par
-\par
-electrode name=anode   top\par
-electrode name=cathode bottom\par
-\par
-#-------------------------------------------------------------------\par
-# DOPING\par
-#-------------------------------------------------------------------\par
-\par
-doping region=$REGION_NO_TOP uniform p.type conc=1e20\par
-doping region=$REGION_NO_EMITTER_TOP uniform p.type conc=1e20\par
-doping region=$REGION_NO_BOTTOM uniform n.type conc=2e18\par
-doping region=$REGION_NO_EMITTER_BOTTOM uniform p.type conc=2e18\par
-\par
-#-------------------------------------------------------------------\par
-# MATERIAL MODELS\par
-#-------------------------------------------------------------------\par
-\par
-models polarization calc.strain polar.scale=0.15\par
-\par
-material material=$PROPERTY_MATERIAL_TOP taun0=1e-9 taup0=1e-9 copt=1.1e-8 augn=1.0e-34 augp=1.0e-34\par
-material material=$PROPERTY_MATERIAL_EMITTER_TOP taun0=1e-9 taup0=1e-9 copt=1.1e-8 augn=1.0e-34 augp=1.0e-34\par
-\par
-material well.gamma0=10e-3\par
-material edb=0.080 eab=0.101\par
-models k.p fermi incomplete consrh auger optr print\par
-models name=well k.p chuang spontaneous lorentz\par
-\par
-mobility material=$PROPERTY_MATERIAL_TOP mun0=300 mup0=10\par
-mobility material=$PROPERTY_MATERIAL_EMITTER_TOP mun0=250 mup0=5\par
-\par
-#-------------------------------------------------------------\par
-# OUTPUT FLAGS AND METHOD\par
-#-------------------------------------------------------------\par
-\par
-output con.band val.band band.param charge polar.charge e.mobility h.mobility \\\par
-       u.srh u.radiative u.auger permi\par
-\par
-#-------------------------------------------------------------\par
-# INITIAL SOLUTION\par
-#-------------------------------------------------------------\par
-\par
-save outf=nanoled1.str\par
-\par
-solve init\par
-method climit=1e-4 maxtrap=10\par
-solve prev\par
-\par
-probe name="Recombination" recombination integrate rname=well\par
-probe name="Radiative" radiative integrate rname=well\par
-\par
-log outf=nanoled1.log\par
-\par
-solve vstep=0.1 vanode=1.5 vfinal=4.0 name=anode\par
-\par
-save spectrum=nanoled1.spc\par
-\par
-#-------------------------------------------------------------\par
-# PLOT STRUCTURE\par
-#-------------------------------------------------------------\par
-\par
-tonyplot nanoled1.str\par
-tonyplot nanoled1.log\par
-#tonyplot nanoled1.spc\par
-\par
-\par
-\par
-\par
-\par
-\par
-\par
-\par
-\par
-\par
-\par
-\par
-\par
-}
- 
+
+go atlas 
+
+#-------------------------------------------------------------------
+# VARIABLES - Change as per needed...
+#-------------------------------------------------------------------
+
+set X_SCALE_START=-0.500
+set X_SCALE_END=0.500
+set NT_WIDTH=0.200
+
+set NT_TOP_HEIGHT=3
+set NT_EMITTER_TOP_HEIGHT=0.3
+set NT_QWELL_INDIVIDUAL_HEIGHT=0.005
+set NT_QWELL_PADDING_HEIGHT=0
+set NT_QWELL_BARRIER_HEIGHT=0.005
+set NT_EMITTER_BOTTOM_HEIGHT=0.100
+set NT_BOTTOM_HEIGHT=1.5
+set SUBSTRATE_HEIGHT=0
+
+set NT_NUMBER_OF_QWELLS=10
+# Do also remove/add wells manually as there is no way to programmatically change this
+
+# set the following material without x.comp, y.comp etc
+set PROPERTY_MATERIAL_QWELL=GaN
+set PROPERTY_MATERIAL_TOP=GaN
+set PROPERTY_MATERIAL_BOTTOM=GaN
+set PROPERTY_MATERIAL_EMITTER_TOP=AlGaN
+set PROPERTY_MATERIAL_EMITTER_BOTTOM=AlGaN
+set PROPERTY_MATERIAL_BARRIER=AlGaN
+
+# Following are materials used in the nanotube. x.comp, y.comp is allowed
+set MATERIAL_SURROUNDING=Air
+set MATERIAL_NT_TOP=$PROPERTY_MATERIAL_TOP
+set MATERIAL_NT_BOTTOM=$PROPERTY_MATERIAL_BOTTOM
+set MATERIAL_NT_QWELL=$PROPERTY_MATERIAL_QWELL
+set MATERIAL_NT_QWELL_PADDING=InGaN
+set MATERIAL_NT_QWELL_BARRIER=$PROPERTY_MATERIAL_BARRIER
+set MATERIAL_NT_EMITTER_TOP=$PROPERTY_MATERIAL_EMITTER_TOP
+set MATERIAL_NT_EMITTER_BOTTOM=$PROPERTY_MATERIAL_EMITTER_BOTTOM
+set MATERIAL_SUBSTRATE=Sapphire
+
+set Y_SPAC_SCALE=1
+set X_SPAC_SCALE=10
+
+#-------------------------------------------------------------------
+# CALCULATED VARIABLES - DO NOT CHANGE!!
+#-------------------------------------------------------------------
+
+set X_SCALE_WIDTH=$X_SCALE_END-$X_SCALE_START
+set X_SCALE_MID=($X_SCALE_START+$X_SCALE_END)/2
+set NT_X_START=$X_SCALE_MID-($NT_WIDTH/2)
+set NT_X_END=$X_SCALE_MID+($NT_WIDTH/2)
+
+set REGION_NO=0
+
+# The following regions will be automatically calculated
+set REGION_NO_TOP=0
+set REGION_NO_BOTTOM=0
+set REGION_NO_SUBSTRATE=0
+set REGION_NO_EMITTER_TOP=0
+set REGION_NO_EMITTER_BOTTOM=0
+
+set NT_QWELL_INDIVIDUAL_EFFECTIVE_HEIGHT=$NT_QWELL_INDIVIDUAL_HEIGHT+(2*$NT_QWELL_PADDING_HEIGHT)
+set NT_QWELL_TOTAL_HEIGHT=$NT_QWELL_INDIVIDUAL_EFFECTIVE_HEIGHT*$NT_NUMBER_OF_QWELLS + $NT_QWELL_BARRIER_HEIGHT*($NT_NUMBER_OF_QWELLS-1)
+set Y_COORDINATE_SUBSTRATE_BOTTOM=0
+set Y_COORDINATE_NT_BOTTOM=-$SUBSTRATE_HEIGHT
+set Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM=$Y_COORDINATE_NT_BOTTOM-$NT_BOTTOM_HEIGHT
+set Y_COORDINATE_QWELL_BOTTOM=$Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM-$NT_EMITTER_BOTTOM_HEIGHT
+set Y_COORDINATE_QWELL_TOP=$Y_COORDINATE_QWELL_BOTTOM-$NT_QWELL_TOTAL_HEIGHT
+set Y_COORDINATE_NT_TOP_EMITTER_TOP=$Y_COORDINATE_QWELL_TOP-$NT_EMITTER_TOP_HEIGHT
+set Y_COORDINATE_NT_TOP=$Y_COORDINATE_NT_TOP_EMITTER_TOP-$NT_TOP_HEIGHT
+
+#-------------------------------------------------------------------
+# MESH GENERATION
+#-------------------------------------------------------------------
+
+mesh auto
+
+x.m l=$X_SCALE_START								s=$X_SPAC_SCALE
+x.m l=$X_SCALE_END								s=$X_SPAC_SCALE
+
+y.m l=$Y_COORDINATE_NT_TOP							s=$Y_SPAC_SCALE*2
+y.m l=$Y_COORDINATE_QWELL_TOP-(0.1*$NT_QWELL_TOTAL_HEIGHT)		s=$Y_SPAC_SCALE
+y.m l=$Y_COORDINATE_QWELL_TOP						s=$NT_QWELL_PADDING_HEIGHT/5
+y.m l=$Y_COORDINATE_QWELL_BOTTOM						s=$NT_QWELL_PADDING_HEIGHT/5
+y.m l=$Y_COORDINATE_QWELL_BOTTOM+(0.1*$NT_QWELL_TOTAL_HEIGHT)		s=($Y_SPAC_SCALE*3)/4
+y.m l=$Y_COORDINATE_NT_BOTTOM						s=$Y_SPAC_SCALE
+y.m l=$Y_COORDINATE_SUBSTRATE_BOTTOM					s=$Y_SPAC_SCALE
+
+#-------------------------------------------------------------
+# DEFINING REGIONS
+#-------------------------------------------------------------
+
+# dummy region
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO material=$MATERIAL_SURROUNDING		x.max=$NT_X_START x.min=$X_SCALE_START	y.max=$Y_COORDINATE_SUBSTRATE_BOTTOM y.min=$Y_COORDINATE_NT_TOP
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO material=$MATERIAL_SURROUNDING		x.max=$X_SCALE_END x.min=$NT_X_START	y.max=$Y_COORDINATE_SUBSTRATE_BOTTOM y.min=$Y_COORDINATE_NT_TOP
+
+# Substrate
+set REGION_NO=$REGION_NO+1
+set REGION_NO_SUBSTRATE=$REGION_NO
+region num=$REGION_NO	material=$MATERIAL_SUBSTRATE	y.max=$Y_COORDINATE_SUBSTRATE_BOTTOM y.min=$Y_COORDINATE_NT_BOTTOM substrate
+
+# Nanotube bottom
+set REGION_NO=$REGION_NO+1
+set REGION_NO_BOTTOM=$REGION_NO
+region num=$REGION_NO	material=$MATERIAL_NT_BOTTOM	x.min=$NT_X_START x.max=$NT_X_END		y.max=$Y_COORDINATE_NT_BOTTOM y.min=$Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM
+
+# Bottom emitter
+
+set REGION_NO=$REGION_NO+1
+set REGION_NO_EMITTER_BOTTOM=$REGION_NO
+region num=$REGION_NO	material=$MATERIAL_NT_EMITTER_BOTTOM	x.min=$NT_X_START x.max=$NT_X_END	\
+		y.max=$Y_COORDINATE_NT_BOTTOM_EMITTER_BOTTOM y.min=$Y_COORDINATE_QWELL_BOTTOM
+
+# 10 wells -----------------------------------------------------------------------------------------------------------
+
+set Y_POINTER=$Y_COORDINATE_QWELL_BOTTOM
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_BARRIER	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_BARRIER_HEIGHT
+
+#-------------------------------------------------------BARRIER-------------------------------------------------------
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL		x.min=$NT_X_START x.max=$NT_X_END name=well \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT qwell led
+set Y_POINTER=$Y_POINTER-$NT_QWELL_INDIVIDUAL_HEIGHT
+
+set REGION_NO=$REGION_NO+1
+region num=$REGION_NO	material=$MATERIAL_NT_QWELL_PADDING	x.min=$NT_X_START x.max=$NT_X_END \ 
+				y.max=$Y_POINTER	y.min=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+set Y_POINTER=$Y_POINTER-$NT_QWELL_PADDING_HEIGHT
+
+
+
+
+
+# Add to or remove wells from here (copy a block of BARRIER, and padding + qwell + padding)
+# Also change the NT_NUMBER_OF_QWELLS variable at line 21
+
+# Top emitter
+
+set REGION_NO=$REGION_NO+1
+set REGION_NO_EMITTER_TOP=$REGION_NO
+region num=$REGION_NO	material=$MATERIAL_NT_EMITTER_BOTTOM	x.min=$NT_X_START x.max=$NT_X_END	\
+		y.max=$Y_COORDINATE_QWELL_TOP y.min=$Y_COORDINATE_NT_TOP_EMITTER_TOP
+
+# Nanotube top
+set REGION_NO=$REGION_NO+1
+set REGION_NO_TOP=$REGION_NO
+region num=$REGION_NO	material=$MATERIAL_NT_TOP		x.min=$NT_X_START x.max=$NT_X_END		y.max=$Y_COORDINATE_NT_TOP_EMITTER_TOP y.min=$Y_COORDINATE_NT_TOP
+
+
+#-------------------------------------------------------------------
+# ELECTRODES
+#-------------------------------------------------------------------
+
+electrode name=anode   top
+electrode name=cathode bottom
+
+#-------------------------------------------------------------------
+# DOPING
+#-------------------------------------------------------------------
+
+doping region=$REGION_NO_TOP uniform p.type conc=1e20
+doping region=$REGION_NO_EMITTER_TOP uniform p.type conc=1e20
+doping region=$REGION_NO_BOTTOM uniform n.type conc=2e18
+doping region=$REGION_NO_EMITTER_BOTTOM uniform p.type conc=2e18
+
+#-------------------------------------------------------------------
+# MATERIAL MODELS
+#-------------------------------------------------------------------
+
+models polarization calc.strain polar.scale=0.15
+
+material material=$PROPERTY_MATERIAL_TOP taun0=1e-9 taup0=1e-9 copt=1.1e-8 augn=1.0e-34 augp=1.0e-34
+material material=$PROPERTY_MATERIAL_EMITTER_TOP taun0=1e-9 taup0=1e-9 copt=1.1e-8 augn=1.0e-34 augp=1.0e-34
+
+material well.gamma0=10e-3
+material edb=0.080 eab=0.101
+models k.p fermi incomplete consrh auger optr print
+models name=well k.p chuang spontaneous lorentz
+
+mobility material=$PROPERTY_MATERIAL_TOP mun0=300 mup0=10
+mobility material=$PROPERTY_MATERIAL_EMITTER_TOP mun0=250 mup0=5
+
+#-------------------------------------------------------------
+# OUTPUT FLAGS AND METHOD
+#-------------------------------------------------------------
+
+output con.band val.band band.param charge polar.charge e.mobility h.mobility \
+       u.srh u.radiative u.auger permi
+
+#-------------------------------------------------------------
+# INITIAL SOLUTION
+#-------------------------------------------------------------
+
+save outf=nanoled1.str
+
+solve init
+method climit=1e-4 maxtrap=10
+solve prev
+
+probe name="Recombination" recombination integrate rname=well
+probe name="Radiative" radiative integrate rname=well
+
+log outf=nanoled1.log
+
+solve vstep=0.1 vanode=1.5 vfinal=4.0 name=anode
+
+save spectrum=nanoled1.spc
+
+#-------------------------------------------------------------
+# PLOT STRUCTURE
+#-------------------------------------------------------------
+
+tonyplot nanoled1.str
+tonyplot nanoled1.log
+#tonyplot nanoled1.spc
+
+
+
+
+
+
+
+
+
+
+
+
